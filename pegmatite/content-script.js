@@ -61,7 +61,7 @@ function replaceElement(umlElem, srcUrl) {
 		parent.replaceChild(imgElem, umlElem);
 	};
 }
-//
+// 佐藤追加
 function appendElement(elementID, srcUrl) {
 	const umlImgId = 'tempUmlImg';
 	let elm = document.querySelector('#'+umlImgId);
@@ -82,20 +82,24 @@ function appendElement(elementID, srcUrl) {
 
 	var parent = imgElem.parentNode;
 
-	imgElem.ondblclick = function() {
-		console.log('123');
-		parent.replaceChild(labelElem, imgElem);
-	};
-	labelElem.ondblclick = function() {
-		console.log('456');
-		parent.replaceChild(imgElem, labelElem);
-	};
+	try{
+		// なぜか反応しない
+		imgElem.ondblclick = function() {
+			console.log('123');
+			parent.replaceChild(labelElem, imgElem);
+		};
+		labelElem.ondblclick = function() {
+			console.log('456');
+			parent.replaceChild(imgElem, labelElem);
+		};
+	}catch{}
 
 	// コードブロックの末尾行の次の要素に兄弟要素としてInsertする
 	// L5cbd66f15ed2cd0000c6cfe7
 	// document.querySelector('#'+elementID).insertAdjacentHTML('afterend','<div>AfterEnd</div>');
 	// document.querySelector('#'+elementID).insertAdjacentHTML('afterend',imgElem);
 	// document.querySelector('#'+elementID).insertAdjacentHTML('afterend',divElem);
+	// debugger;
 	document.querySelector('#'+elementID).insertAdjacentHTML('afterend',divElem.outerHTML);
 
 }
@@ -103,6 +107,47 @@ function appendElement(elementID, srcUrl) {
 let lastUmlLineId = "";
 let lastFetchImageTime = new Date();
 let hasRefreshImage = false;
+
+// なぜか、関数を１つにまとめると、変数に値がSetされなくなってしまった
+// function scrapbox用のソースコード処理(elem){
+// 	let lineElms = elem.querySelectorAll(".line");
+// 	let returnStr = '';
+// 	let isInPlantUmlCode = false;
+// 	let isFirstRowOfCodeBlock = false;
+// 	let isPlantUmlソースコード = false;
+// 	//! code-block が、コードブロックの開始。拡張子が「puml」なら、それ以降の文字列がソースコード。（classに「indent-0」が含まれるか、コンテンツ末尾までがコード）
+// 	for(let i=1; i < lineElms.length; i++){ // 先頭行（タイトル）は無視
+// 		let classStr = lineElms[i].getAttribute('class');
+// 		let childElmClassStr = lineElms[i].querySelector('span').getAttribute('class'); //子要素のspan要素のclass属性
+// 		if(childElmClassStr.indexOf('code-block')>=0){
+// 			if((isFirstRowOfCodeBlock === false)&&(isInPlantUmlCode === false)){
+// 				isFirstRowOfCodeBlock = true;
+// 				isInPlantUmlCode = true;
+// 			}
+// 			// lineElms[i].textContent.indexOf('code:')>=0 ← code:はtextContentには含まれない
+// 			if(isFirstRowOfCodeBlock &&(lineElms[i].textContent.indexOf('.puml')>=0||lineElms[i].textContent.indexOf('.uml')>=0)){
+// 				// isFirstRowOfCodeBlock = false; // 初期化
+// 				isPlantUmlソースコード = true;
+// 			}
+// 		}
+// 		if(isInPlantUmlCode && isPlantUmlソースコード){
+// 			if(childElmClassStr.indexOf('code-block')===-1){
+// 				isInPlantUmlCode = false;
+// 				break;
+// 			}else{
+// 				if(isFirstRowOfCodeBlock === false){
+// 					returnStr = returnStr + lineElms[i].textContent.trim()+ "\n";
+// 					// lastUmlLineId = lineElms[i].getAttribute('id');
+// 					this.lastUmlLineId = lineElms[i].getAttribute('id');
+// 					// console.log(`${i}、${this.lastUmlLineId}`);
+// 				}
+// 			}
+// 		}
+// 		if(isFirstRowOfCodeBlock) isFirstRowOfCodeBlock = false;
+// 	};
+// 	return returnStr;
+// }
+
 
 var siteProfiles = {
 	"default": {
@@ -166,21 +211,15 @@ var siteProfiles = {
 	"scrapbox.io":{
 		"selector": ".lines",
 		"extract": function (elem) {
-			// // .lineの全テキストを取得
-			// let lineElms = elem.querySelectorAll(".line");
-			// let retunStr = '';
-			// //! code-block が、コードブロックの開始。拡張子が「puml」なら、それ以降の文字列がソースコード。（classに「indent-0」が含まれるか、末尾まで）
-			// for(let i=2; i < lineElms.length; i++){ // 先頭行（タイトル）とファイル名は無視
-			// 	retunStr = retunStr + lineElms[i].textContent.trim() + "\n";
-			// };
-			// return retunStr;
+			// .lineの全テキストを取得
 			let lineElms = elem.querySelectorAll(".line");
-			let retunStr = '';
+			let returnStr = '';
 			let isInPlantUmlCode = false;
 			let isFirstRowOfCodeBlock = false;
 			let isPlantUmlソースコード = false;
 			//! code-block が、コードブロックの開始。拡張子が「puml」なら、それ以降の文字列がソースコード。（classに「indent-0」が含まれるか、コンテンツ末尾までがコード）
 			for(let i=1; i < lineElms.length; i++){ // 先頭行（タイトル）は無視
+				console.log(lineElms[i]);
 				let classStr = lineElms[i].getAttribute('class');
 				let childElmClassStr = lineElms[i].querySelector('span').getAttribute('class'); //子要素のspan要素のclass属性
 				if(childElmClassStr.indexOf('code-block')>=0){
@@ -200,7 +239,7 @@ var siteProfiles = {
 						break;
 					}else{
 						if(isFirstRowOfCodeBlock === false){
-							retunStr = retunStr + lineElms[i].textContent.trim()+ "\n";
+							returnStr = returnStr + lineElms[i].textContent.trim()+ "\n";
 							// lastUmlLineId = lineElms[i].getAttribute('id');
 							this.lastUmlLineId = lineElms[i].getAttribute('id');
 							// console.log(`${i}、${this.lastUmlLineId}`);
@@ -209,53 +248,11 @@ var siteProfiles = {
 				}
 				if(isFirstRowOfCodeBlock) isFirstRowOfCodeBlock = false;
 			};
-			return retunStr;
-		},
-		"replace": function (elem) {
-			let lineElms = elem.querySelectorAll(".line");
-			let retunStr = '';
-			for(let i=2; i < lineElms.length; i++){ // 先頭行（タイトル）とファイル名は無視
-				retunStr = retunStr + lineElms[i].textContent.trim();
-			};
-			return retunStr;
-		},
-		"compress": function (elem) {
-			let lineElms = elem.querySelectorAll(".line");
-			let retunStr = '';
-			let isInPlantUmlCode = false;
-			let isFirstRowOfCodeBlock = false;
-			let isPlantUmlソースコード = false;
-			//! code-block が、コードブロックの開始。拡張子が「puml」なら、それ以降の文字列がソースコード。（classに「indent-0」が含まれるか、コンテンツ末尾までがコード）
-			for(let i=1; i < lineElms.length; i++){ // 先頭行（タイトル）は無視
-				let classStr = lineElms[i].getAttribute('class');
-				let childElmClassStr = lineElms[i].querySelector('span').getAttribute('class'); //子要素のspan要素のclass属性
-				if(childElmClassStr.indexOf('code-block')>=0){
-					if((isFirstRowOfCodeBlock === false)&&(isInPlantUmlCode === false)){
-						isFirstRowOfCodeBlock = true;
-						isInPlantUmlCode = true;
-					}
-					// lineElms[i].textContent.indexOf('code:')>=0 ← code:はtextContentには含まれない
-					if(isFirstRowOfCodeBlock &&(lineElms[i].textContent.indexOf('.puml')>=0||lineElms[i].textContent.indexOf('.uml')>=0)){
-						// isFirstRowOfCodeBlock = false; // 初期化
-						isPlantUmlソースコード = true;
-					}
-				}
-				if(isInPlantUmlCode && isPlantUmlソースコード){
-					if(childElmClassStr.indexOf('code-block')===-1){
-						isInPlantUmlCode = false;
-						break;
-					}else{
-						if(isFirstRowOfCodeBlock === false){
-							retunStr = retunStr + lineElms[i].textContent.trim()+ "\n";
-							// lastUmlLineId = lineElms[i].getAttribute('id');
-							this.lastUmlLineId = lineElms[i].getAttribute('id');
-							// console.log(`${i}、${this.lastUmlLineId}`);
-						}
-					}
-				}
-				if(isFirstRowOfCodeBlock) isFirstRowOfCodeBlock = false;
-			};
-			return compress(retunStr);
+			// 最初にcode:**.pumlを記述した後、内容を書いた後に @startuml か @enduml を書くと、表示されない
+			if((returnStr !== '')&&(returnStr.indexOf('@startnum')===-1||returnStr.indexOf('@startnum')===-1)){
+				console.error('拡張子がPlantUML（puml/uml）にも関わらず@startuml か @enduml が含まれていません' );
+			}
+			return returnStr;
 		},
 		"getLastUmlLineId":function(){
 			return this.lastUmlLineId;
@@ -273,11 +270,22 @@ function loop(counter, retry, siteProfile, baseUrl){
 		onLoadAction(siteProfile, baseUrl);
 	}
 }
+function loopForScrapbox(counter, retry, siteProfile, baseUrl){
+	counter++;
+	if (document.querySelectorAll(".line").length===0) counter+=retry;
+	var id = setTimeout(loop,100,counter,retry, siteProfile, baseUrl);
+	if(counter>=retry){
+		clearTimeout(id);
+		onLoadAction(siteProfile, baseUrl);
+	}
+}
 
 function onLoadAction(siteProfile, baseUrl){
 	[].forEach.call(document.querySelectorAll(siteProfile.selector), function (umlElem) {
 		var plantuml = siteProfile.extract(umlElem);
-		if (plantuml.substr(0, "@start".length) !== "@start") return;
+		if (plantuml.substr(0, "@start".length) !== "@start") {
+			return;
+		}
 		var plantUmlServerUrl = baseUrl + siteProfile.compress(umlElem);
 		var replaceElem = siteProfile.replace(umlElem);
 		if (plantUmlServerUrl.lastIndexOf("https", 0) === 0) { // if URL starts with "https"
@@ -297,26 +305,28 @@ function run(config) {
 	console.log(siteProfile);
 	// var baseUrl = config.baseUrl || "https://www.plantuml.com/plantuml/img/"; //svgもサポートしている
 	var baseUrl = config.baseUrl || "https://www.plantuml.com/plantuml/svg/";
-	if (document.querySelector("i[aria-label='Loading content…']")!=null){ // for wait loading @ gitlab.com
-		loop(1, 10, siteProfile, baseUrl);
-	}
 
-	//Todo:Scrapboxの場合、コンテンツの読み込みを待つ処理をここに入れたい
+	if(hostname ==! "scrapbox.io"){
+		if (document.querySelector("i[aria-label='Loading content…']")!=null){ // for wait loading @ gitlab.com
+			loop(1, 10, siteProfile, baseUrl);
+		}
+	}else{
+		//Todo:Scrapboxの場合、コンテンツの読み込みを待つ処理を追加（うまくいかなかった）
+		// if (document.querySelectorAll(".line").length===0){ // for wait loading @ scrapbox.io
+		// 	loopForScrapbox(1, 10, siteProfile, baseUrl);
+		// }
+	}
 	
 	[].forEach.call(document.querySelectorAll(siteProfile.selector), function (umlElem) {
 		
-		console.log(umlElem);
-
 		var plantuml = siteProfile.extract(umlElem);
 		if (plantuml.substr(0, "@start".length) !== "@start") return;
-		var plantUmlServerUrl = baseUrl + siteProfile.compress(umlElem);
-		var replaceElem = siteProfile.replace(umlElem);
+		var plantUmlServerUrl =  '';
 		
 		if(hostname === "scrapbox.io"){
-		  //appendElement(siteProfile.lastUmlLineId,     plantUmlServerUrl);
-			appendElement(siteProfile.getLastUmlLineId(),plantUmlServerUrl);
+			plantUmlServerUrl = baseUrl + compress(siteProfile.extract(umlElem)); // PlantUMLのソースを抽出した後にエンコードする
+			appendElement(siteProfile.getLastUmlLineId(),plantUmlServerUrl); // 何故か getLastUmlLineId()がundefinedになる場合がある
 
-			// $('#text-input')[0].addEventListener('keydown', () => {
 			document.querySelector('#text-input').addEventListener('keydown', () => {
 				hasRefreshImage = false;		
 				refreshPlantUmlImage();
@@ -326,6 +336,8 @@ function run(config) {
 			}, { once:true } ); //１度のみイベントハンドラを追加
 		}
 		else{
+			plantUmlServerUrl =  baseUrl + siteProfile.compress(umlElem);
+			var replaceElem = siteProfile.replace(umlElem);
 			if (plantUmlServerUrl.lastIndexOf("https", 0) === 0) { // if URL starts with "https"
 				replaceElement(replaceElem, plantUmlServerUrl);
 			} else {
@@ -340,8 +352,8 @@ function run(config) {
 
 function refreshPlantUmlImage(){
 	// 直前に実行されたのが3秒以上前なら
-	var d1 = new Date(); // new Date('2017/01/05 12:15:20');
-	var d2 = lastFetchImageTime; // new Date('2016/12/15 01:09:02');
+	var d1 = new Date();         //例： new Date('2017/01/05 12:15:20');
+	var d2 = lastFetchImageTime; //例： new Date('2016/12/15 01:09:02');
 	var diffTime = d1.getTime() - d2.getTime();
 	var diffSeconds = Math.floor(diffTime / 1000);
 	if(diffSeconds>3){
@@ -372,8 +384,9 @@ chrome.storage.local.get("baseUrl", function(config) {
 		});
 	}
 
-	setTimeout(function(){ // Scrapboxのページコンテンツが読み込まれるのを待つ
+	setTimeout(function(){ // Scrapboxのページコンテンツが読み込まれるのを待つ（これを入れないとScrapboxでPlantUMLが表示されないので注意❗
 		run(config);
-	},2000); // コンテンツが多いと、２秒では足りないかもしれない
-	// },4000);
+	// },2000); // コンテンツが多いと、２秒では足りないかもしれない
+	},3000);
+// },4000);
 });
