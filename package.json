@@ -1,7 +1,7 @@
 {
-	"name": "pegmatite",
-	"version": "1.2.0",
-	"description": "Pegmatite is Google Chrome extension that replace PlantUML code blocks into preview images.",
+	"name": "PlantUML Viewer for Scrapbox",
+	"version": "0.5.0",
+	"description": "PegmatiteをForkして、Scrapboxにも対応したものです(Pegmatite is Google Chrome extension that replace PlantUML code blocks into preview images.)",
 	"private": true,
 	"scripts": {
 		"format": "eslint pegmatite --fix",
