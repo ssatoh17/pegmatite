@@ -61,9 +61,11 @@ function replaceElement(umlElem, srcUrl) {
 		parent.replaceChild(imgElem, umlElem);
 	};
 }
+
+//Todo:表示した画面から遷移した際に、その画像が残り続けてしまっている
 // 佐藤追加
+const umlImgId = 'tempUmlImg';
 function appendElement(elementID, srcUrl) {
-	const umlImgId = 'tempUmlImg';
 	let elm = document.querySelector('#'+umlImgId);
 	try{
 		elm.parentNode.removeChild(elm);
@@ -94,14 +96,8 @@ function appendElement(elementID, srcUrl) {
 		};
 	}catch{}
 
-	// コードブロックの末尾行の次の要素に兄弟要素としてInsertする
-	// L5cbd66f15ed2cd0000c6cfe7
-	// document.querySelector('#'+elementID).insertAdjacentHTML('afterend','<div>AfterEnd</div>');
-	// document.querySelector('#'+elementID).insertAdjacentHTML('afterend',imgElem);
-	// document.querySelector('#'+elementID).insertAdjacentHTML('afterend',divElem);
-	// debugger;
+	// コードブロック末尾行の次の要素に兄弟要素としてInsertする
 	document.querySelector('#'+elementID).insertAdjacentHTML('afterend',divElem.outerHTML);
-
 }
 
 let lastUmlLineId = "";
@@ -366,6 +362,13 @@ function refreshPlantUmlImage(){
 		});	
 	}
 }
+
+
+// // 2019-04-26 追加 ⇒ 意味がなかった（ページ内リンクclick時にJavascriptは読み込まれなかった
+// let elm = document.querySelector('#'+umlImgId);
+// try{
+// 	elm.parentNode.removeChild(elm);
+// }catch{}
 
 chrome.storage.local.get("baseUrl", function(config) {
 	if (window.location.hostname === "bitbucket.org") {
