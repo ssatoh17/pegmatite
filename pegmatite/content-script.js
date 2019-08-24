@@ -1,5 +1,60 @@
 /* global chrome */
 
+// //! タイトルの監視 （ https://qiita.com/munieru_jp/items/a6f1433652124a2165e4 のコピペ）
+// //監視ターゲットの取得
+// // const target = document.querySelector('div.line.section-0.line-title.section-title');
+// const target = document.querySelector('.page');
+
+// //オブザーバーの作成
+// const observer = new MutationObserver(records => {
+// 	//なんらかの処理を行なう
+// 	// console.info('タイトルが更新されました');
+// 	console.info('コンテンツが更新されました');
+// 	debugger;
+// });
+
+// //監視オプションの作成
+// const options = {
+// 	attributes: true,
+// 	characterData: true,
+// 	childList: true
+// };
+
+// //監視の開始
+// observer.observe(target, options);
+
+// //監視の停止（実際には特定条件下で実行）
+// // let shouldStopObserving = false;
+// // if(shouldStopObserving){
+// //     observer.disconnect();
+// // }
+
+// //! タイトルの変更監視 ここまで
+
+const umlImgId = 'tempUmlImg';
+
+setInterval(function(){
+	const ScrapboxPreUrl = 'ScrapboxPreUrl';
+	let currentUrl = window.location.href;
+	// if(preUrl != ''){
+	try{		
+		if(currentUrl != localStorage.getItem(ScrapboxPreUrl)){
+			console.log('urlが変わりました❗');
+			// 画面上に前ページの要素が表示されていたら、削除する
+			if(document.querySelector('div.lines > div').id == umlImgId){
+				document.querySelector('div.lines > div').remove();
+			}
+		}
+	}catch{
+
+	}
+	//preUrl = currentUrl;
+	localStorage.setItem(ScrapboxPreUrl,currentUrl);
+	// }
+	// console.log(`currentUrl = ${currentUrl}`);
+},2000);
+
+
 function encode64(data) {
 	for (var r = "", i = 0, n = data.length; i < n; i += 3) {
 		r += append3bytes(
@@ -64,7 +119,6 @@ function replaceElement(umlElem, srcUrl) {
 
 //Todo:表示した画面から遷移した際に、その画像が残り続けてしまっている
 // 佐藤追加
-const umlImgId = 'tempUmlImg';
 function appendElement(elementID, srcUrl) {
 	let elm = document.querySelector('#'+umlImgId);
 	try{
@@ -390,6 +444,6 @@ chrome.storage.local.get("baseUrl", function(config) {
 	setTimeout(function(){ // Scrapboxのページコンテンツが読み込まれるのを待つ（これを入れないとScrapboxでPlantUMLが表示されないので注意❗
 		run(config);
 	// },2000); // コンテンツが多いと、２秒では足りないかもしれない
-	},3000);
-// },4000);
+	// },3000); // これでも表示されないことがあった
+	},4000);
 });
