@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
-  "name": "PlantUML Viewer for Scrapbox",
-  "version": "0.6.0",
+  "name": "PlantUML Viewer for Scrapbox(Pegmatiteの拡張)",
+  "version": "1.0.0",
   "description": "Shows graphs and diagrams rendered by PlantUML.",
   "permissions": ["storage", "<all_urls>"],
   "options_page": "options.html",
